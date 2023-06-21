@@ -1,31 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
 import ListItem from "./ListItem";
+import SharedContext from "./SharedContext";
+import ThemeSwitch from "./ThemeSwitch";
 
-class App extends React.Component {
-  state = {
-    selectedItems: [],
+function App() {
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [theme, setTheme] = useState("light");
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light");
   };
 
-  listItemChangeHandler = (item) => {
-    //
-    let newSelectedItems = [...this.state.selectedItems];
+  function listItemChangeHandler(item) {
+    let newSelectedItems = [...selectedItems];
 
     if (newSelectedItems.includes(item)) {
-      newSelectedItems = this.state.selectedItems.filter(
-        (theItem) => item !== theItem
-      );
+      newSelectedItems = selectedItems.filter((theItem) => item !== theItem);
     } else {
       newSelectedItems.push(item);
     }
 
-    this.setState({
-      selectedItems: newSelectedItems,
-    });
-  };
+    setSelectedItems(newSelectedItems);
+  }
 
-  render() {
-    return (
-      <div className="min-h-screen flex justify-center items-center bg-slate-200">
+  return (
+    <SharedContext.Provider value={{ theme: theme, toggleTheme: toggleTheme }}>
+      <div
+        className={`min-h-screen flex justify-center items-center ${
+          theme === "light" ? "bg-slate-50" : "bg-slate-200"
+        }`}
+      >
+        {theme}
         <div className="flex max-w-3xl mx-auto w-full gap-x-8">
           <div className="w-1/2">
             <h2 className="text-2xl font-bold">Apple Products</h2>
@@ -35,8 +39,8 @@ class App extends React.Component {
                   return (
                     <ListItem
                       key={item}
-                      active={this.state.selectedItems.includes(item)}
-                      onChange={this.listItemChangeHandler}
+                      active={selectedItems.includes(item)}
+                      onChange={listItemChangeHandler}
                     >
                       {item}
                     </ListItem>
@@ -45,7 +49,7 @@ class App extends React.Component {
               )}
             </ul>
             <p className="mt-3 text-slate-400 text-sm">
-              {this.state.selectedItems.length} item(s) selected
+              {selectedItems.length} item(s) selected
             </p>
           </div>
           <div className="w-1/2">
@@ -53,13 +57,16 @@ class App extends React.Component {
               Selected Products
             </h2>
             <p className="mt-4 text-slate-800 text-lg">
-              {this.state.selectedItems.join(", ")}
+              {selectedItems.join(", ")}
             </p>
+          </div>
+          <div>
+            <ThemeSwitch></ThemeSwitch>
           </div>
         </div>
       </div>
-    );
-  }
+    </SharedContext.Provider>
+  );
 }
 
 export default App;
